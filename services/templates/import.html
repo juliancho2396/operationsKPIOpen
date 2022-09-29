@@ -1,0 +1,15 @@
+
+{% extends 'frontend/index.html' %}
+
+
+
+
+{%block content%}
+<form method="POST">
+    {% csrf_token %}
+    <textarea id="services" name="services" class="form-control"></textarea>
+    <button type="submit" class="btn btn-block btn-primary">Import services</button>
+</form>
+
+
+{%endblock content%}

@@ -1,0 +1,80 @@
+
+{% extends 'frontend/index.html' %}
+
+
+
+
+{%block content%}
+<form method="POST">
+    {% csrf_token %}
+    <div class="block">
+        <!-- Alert Messages Title -->
+        <div class="block-title">
+            <h2>ACTIONS</h2>
+        </div>
+        <!-- END Alert Messages Title -->
+
+        <!-- Alert Messages Content -->
+        <div class="row">
+            <div class="col-sm-12 col-lg-12">
+                <!-- Warning Alert -->
+                <div class="alert alert-warning alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><strong>Warning</strong></h4>
+                    <p>Please don't forget to click on <strong>SEND</strong>. If you close this window, the report will be saved but not sent!</p>
+                </div>
+                <!-- END Warning Alert -->
+                <div class="col-sm-6 col-lg-3">
+                    <a href="javascript:void(0)" class="widget">
+                        <div class="widget-content widget-content-mini themed-background-muted">
+                            <span class="pull-right text-muted">--</span>
+                            <strong class="text-dark">OPCION</strong>
+                        </div>
+                        <div class="widget-content text-right clearfix">
+                            <div class="widget-icon themed-background-amethyst pull-left">
+                                <i class="gi gi-video_hd text-light-op"></i>
+                            </div>
+                            <h2 class="widget-heading h3 themed-color-amethyst"><strong>##</strong></h2>
+                            <span class="text-muted">AGREGAR OPCION</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+        
+            
+            <div class="block-title">
+                <h2>ISSUE REPORT</h2>
+            </div>
+            <div class="row">
+                <p>Dear all.</p>
+                <p>Please be aware of the following issue for the service:</p>
+                <p><strong>SO {{service.SO}} - {{service.name}}</strong></p>
+                <p>
+                    &emsp;&emsp;<strong>Transmission-window start time:</strong> {{service.starttime}} GMT<br>
+                    &emsp;&emsp;<strong>Transmission-window end time:</strong> {{service.starttime}} GMT
+                </p>
+                <p><strong>Route:<strong> <input type="text" class="form-control"></p>
+                    <p>
+                        {%for log in logs %}
+                        {{log.time}}
+                        {%endfor%}
+                    </p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+                <p></p>
+            </div>
+        
+        
+        
+        
+        </div>
+    <button type="submit" class="btn btn-block btn-primary">Import services</button>
+    </div>
+</form>
+
+
+{%endblock content%}
