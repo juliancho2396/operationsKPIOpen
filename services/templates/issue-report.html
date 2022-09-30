@@ -53,12 +53,12 @@
                 <p><strong>SO {{service.SO}} - {{service.name}}</strong></p>
                 <p>
                     &emsp;&emsp;<strong>Transmission-window start time:</strong> {{service.starttime}} GMT<br>
-                    &emsp;&emsp;<strong>Transmission-window end time:</strong> {{service.starttime}} GMT
+                    &emsp;&emsp;<strong>Transmission-window end time:</strong> {{service.endtime}} GMT
                 </p>
-                <p><strong>Route:<strong> <input type="text" class="form-control"></p>
+                <p><strong>Route:</strong> <input type="text" class="form-control"></p>
                     <p>
                         {%for log in logs %}
-                        {{log.time}}
+                        <strong>{{log.time}} GMT</strong> {{log.comment}}<br>
                         {%endfor%}
                     </p>
                 <p></p>

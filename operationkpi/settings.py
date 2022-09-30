@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'dashboard',
     'authentication',
     'services',
+    'customers',
     'pyperclip',
 ]
 
@@ -137,4 +138,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
+    
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_HOST_USER = os.environ.get('HOSTMAIL'),
+EMAIL_HOST_PASSWORD = os.environ.get('MAILPASS')
+EMAIL_PORT = 587
+timeout: 10

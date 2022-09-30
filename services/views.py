@@ -73,7 +73,7 @@ def servicesoverview(request, *args, **kwargs):
     
     
     context = {
-        'services':servicecoordination.objects.filter(SO__endtime__gte=datetime.now() + timedelta(minutes=120)).exclude(SO__customer="Fanatiz").order_by('SO__starttime')    
+        'services':servicecoordination.objects.filter(SO__starttime__gte=datetime.now().date(), SO__endtime__lte=datetime.now().replace(hour=4) + timedelta(days=1)).exclude(SO__customer="Fanatiz").order_by('SO__starttime')    
     }
     
     return render(request, 'services.html', context)

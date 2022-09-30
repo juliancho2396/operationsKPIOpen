@@ -1,12 +1,12 @@
 
 {% extends 'frontend/index.html' %}
 
-
+{%block title%}Services{%endblock title%}
 
 
 {%block content%}
-
-<div class="col-md-8 col-lg-12">
+<div class="container" style="width:100%;">
+<div class="col-md-12 col-sm-12 col-lg-12">
     <!-- Tickets Block -->
     <div class="block">
         <!-- Tickets Title -->
@@ -16,7 +16,8 @@
             </div>
             <ul class="nav nav-tabs" data-toggle="tabs">
                 <li class="active"><a href="#tickets-list">Services List</a></li>
-                <li><a href="#tickets-single">Other</a></li>
+                <li><a href="#ongoing-services">Ongoing</a></li>
+                <li><a href="#terminated-services">Terminated</a></li>
             </ul>
         </div>
         <!-- END Tickets Title -->
@@ -42,6 +43,7 @@
                             </thead>
                             <tbody>
                                 {%for service in services%}
+                                {%if not service.destinationok%}
                                 <form method="POST" action="{% url 'services:savechanges'%}">
                                     {% csrf_token %}
                                     
@@ -92,6 +94,7 @@
                                                 <li {%if service.destinationok %}class="disabled"{%endif%}><a href="{% url 'services:destinationok' service.SO.SO %}" {%if service.destinationok %}disabled{%endif%}>Destination OK</a></li>
                                                 <li class="divider"></li>
                                                 <li><a href="javascript:void(0)">Comentary</a></li>
+                                                <li><a href="{%if service.sentemail %}#{%else%}{% url 'customers:deliverserviceemail' service.SO.SO %}{%endif%}">Email delivery</a></li>
                                                 <li class="divider"></li>
                                                 <li><a href="{% url 'services:issuereport' service.SO.SO%}">Issue report</a></li>
                                             </ul>
@@ -101,6 +104,7 @@
                                     
                                 </tr>
                             </form>
+                            {%endif%}
                                 {%endfor%}
                                 
                             </tbody>
@@ -120,94 +124,207 @@
             <!-- END Tickets List -->
 
             <!-- Ticket View -->
-            <div class="tab-pane" id="tickets-single">
-                <div class="alert alert-success animation-fadeInQuick">Current Status: <strong>OPEN</strong></div>
-                <a href="javascript:void(0)" class="btn btn-xs btn-default pull-right"><i class="fa fa-check"></i> Flag as Closed</a>
-                <a href="javascript:void(0)" class="btn btn-xs btn-danger"><i class="fa fa-flag"></i> Flag as Urgent</a>
-                <a href="javascript:void(0)" class="btn btn-xs btn-warning"><i class="fa fa-flag"></i> Flag as Invalid</a>
-                <hr>
-                <ul class="media-list media-feed push">
-                    <!-- Ticket -->
-                    <li class="media">
-                        <a href="page_ready_user_profile.html" class="pull-left">
-                            <img src="img/placeholders/avatars/avatar9.jpg" alt="Avatar" class="img-circle">
-                        </a>
-                        <div class="media-body">
-                            <p class="push-bit">
-                                <span class="text-muted pull-right">
-                                    <small>2 hours ago</small>
-                                </span>
-                                <small><a href="page_ready_user_profile.html">Howard Smith</a> through <a href="javascript:void(0)">Forum</a></small>
-                            </p>
-                            <h4><strong>Can you help me with the installation?</strong></h4>
-                            <p>Hi, I'm having a problem with the installation of the theme, can you help me out? I get the following error message and I don't know what to do:</p>
-                            <div class="alert alert-warning">
-                                <p><i class="fa fa-angle-right"></i> <strong>Error Establishing Database Connection</strong></p>
-                                <p>...</p>
-                            </div>
-                            <p>
-                                <a href="javascript:void(0)" class="btn btn-xs btn-default"><i class="fa fa-support"></i> Ask for Assistance</a>
-                                <a href="javascript:void(0)" class="btn btn-xs btn-default"><i class="fa fa-user"></i> Assign this ticket</a>
-                            </p>
+            <div class="tab-pane" id="ongoing-services">
+                <div class="tab-pane active" id="tickets-list">
+                    <div class="block-content-full">
+                        <div class="table-responsive remove-margin-bottom">
+                            <table class="table table-striped table-vcenter remove-margin-bottom">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">SO</th>
+                                        <th>Description</th><th>Type</th>
+                                        <th>Time slot</th>
+                                        <th>Source</th>
+                                        <th>Destination</th>                                    
+                                        <th class="text-center">Monitoring</th>
+                                        <th>Options</th>
+                                        <th class="text-center"><i class="fa fa-comments"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {%for service in services%}
+                                    {%if service.destinationok%}
+                                    <form method="POST" action="{% url 'services:savechanges'%}">
+                                        {% csrf_token %}
+                                        
+                                    <tr>
+                                        <input type="text" id="so" name="so" value="{{service.SO.SO}}" hidden>
+                                        <td class="text-center">{{service.SO.SO}}</td>
+                                        <td>{{service.SO.name}}<br>
+                                            <a href="javascript:void(0)"><strong>Trace visual route of service</strong></a> 
+                                            {%if service.checkedby.all %} | <i class="fa fa-binoculars" title="{{service.checkedby.all|length}} operator(s) verified booking"></i>: {{service.checkedby.all|length}} {%endif%}
+                                            {%if service.openedby %} | <i class="fa fa-plug" title="Connection(s) opened"></i> {%endif%}
+                                            {%if service.originok.all %} | <i class="fa fa-toggle-right" title="{{service.originok.all|length}} confirmed origin signal"></i>: {{service.originok.all|length}} {%endif%}
+                                            {%if service.destinationok %} | <i class="fa fa-thumbs-o-up" title="service delivered"></i> {%endif%}
+                                            
+                                            
+                                        </td>
+                                        <td><span class="label label-success">ONGOING</span></td> <!--success, default or warning-->
+                                        <td>
+                                            <span class="label label-default">{{service.SO.starttime}}</span>
+                                        <br>
+                                        <span class="label label-default">{{service.SO.endtime}}</span>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="origin" name="origin" class="form-control" autocomplete="off" placeholder="Custom origin..." {%if service.origin%}value="{{service.origin}}"{%endif%}>
+                                            <span class="text-muted"><strong>{{service.SO.origin}}</strong></span><br>
+                                            
+                                        </td>
+                                        <td>
+                                            <input type="text" id="destination" name="destination" class="form-control" autocomplete="off" placeholder="Custom destination..." {%if service.destination%}value="{{service.destination}}"{%endif%}>
+                                            <span class="text-muted"><strong>{{service.SO.destination}}</strong></span>
+                                        </td>
+                                        <td class="text-center">
+                                            
+                                            <input type="text" id="monitor" name="monitor" class="form-control" autocomplete="off" placeholder="ATE/NTT/OG..." {%if service.monitor%}value="{{service.monitor}}"{%endif%}>
+                                            <button class="btn btn-effect-ripple btn-primary fa fa-save" style="overflow: hidden;" action="submit"></button>
+                                            <a href="{% url 'services:refresh'%}" class="btn btn-effect-ripple btn-primary fa fa-refresh" style="overflow: hidden;"></a>
+                                            <a href="#" class="btn btn-effect-ripple btn-primary fa fa-search" style="overflow: hidden;"></a>
+                                            <a href="#" class="btn btn-effect-ripple btn-primary fa fa-remove" style="overflow: hidden;"></a>
+                                            </td>
+                                        
+                                        <td>
+                                            <div class="input-group-btn">
+                                                <button type="button" class="btn btn-effect-ripple btn-primary" style="overflow: hidden; position: relative;">Details</button>
+                                                <button type="button" class="btn btn-effect-ripple btn-primary dropdown-toggle" data-toggle="dropdown" style="overflow: hidden; position: relative;" aria-expanded="false"><span class="btn-ripple animate" style="height: 34px; width: 34px; top: 4.625px; left: -4.4375px;"></span><span class="caret"></span></button>
+                                                <ul class="dropdown-menu">
+                                                    <li {%for a in service.checkedby.all%}{%if a.username == user.username %}class="disabled"{%endif%}{%endfor%}><a href="{% url 'services:checkbooking' service.SO.SO %}">Check booking</a></li>
+                                                    <li {%if service.openedby %}class="disabled"{%endif%}><a href="{% url 'services:openconnections' service.SO.SO %}" {%if service.openedby %}disabled{%endif%}>Open connections</a></li>
+                                                    <li {%for a in service.originok.all%}{%if a.username == user.username %}class="disabled"{%endif%}{%endfor%}><a href="{% url 'services:originok' service.SO.SO %}">Origin signal OK</a></li>
+                                                    <li {%if service.destinationok %}class="disabled"{%endif%}><a href="{% url 'services:destinationok' service.SO.SO %}" {%if service.destinationok %}disabled{%endif%}>Destination OK</a></li>
+                                                    <li class="divider"></li>
+                                                    <li><a href="javascript:void(0)">Comentary</a></li>
+                                                    <li class="divider"></li>
+                                                    <li><a href="{% url 'services:issuereport' service.SO.SO%}">Issue report</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><span class="badge">3</span></td>
+                                        
+                                    </tr>
+                                </form>
+                                {%endif%}
+                                    {%endfor%}
+                                    
+                                </tbody>
+                            </table>
                         </div>
-                    </li>
-                    <!-- END Ticket -->
-
-                    <!-- Replies -->
-                    <li class="media">
-                        <a href="page_ready_user_profile.html" class="pull-left">
-                            <img src="img/placeholders/avatars/avatar.jpg" alt="Avatar" class="img-circle">
-                        </a>
-                        <div class="media-body">
-                            <p class="push-bit">
-                                <span class="text-muted pull-right">
-                                    <small>1 hour ago</small>
-                                </span>
-                                <small><a href="page_ready_user_profile.html">Support</a></small>
-                            </p>
-                            <p>Hi Howard and thank you very much for your purchase! There are many reasons this can happen. One is the incorrect information in wp-config.html file. Please open up wp-config.html and ensure that the following are correct:</p>
-                            <ul class="fa-ul push">
-                                <li><i class="fa fa-li fa-check text-success"></i> Database name</li>
-                                <li><i class="fa fa-li fa-check text-success"></i> Database username</li>
-                                <li><i class="fa fa-li fa-check text-success"></i> Database password</li>
-                                <li><i class="fa fa-li fa-check text-success"></i> Database host</li>
+                        <div class="text-center">
+                            <ul class="pagination">
+                                <li class="disabled"><a href="javascript:void(0)"><i class="fa fa-chevron-left"></i></a></li>
+                                <li class="active"><a href="javascript:void(0)">1</a></li>
+                                <li><a href="javascript:void(0)">2</a></li>
+                                <li><a href="javascript:void(0)">3</a></li>
+                                <li><a href="javascript:void(0)"><i class="fa fa-chevron-right"></i></a></li>
                             </ul>
-                            <p>Learn more about <a href="javascript:void(0)">editing the wp-config.html</a></p>
                         </div>
-                    </li>
-                    <li class="media">
-                        <a href="page_ready_user_profile.html" class="pull-left">
-                            <img src="img/placeholders/avatars/avatar9.jpg" alt="Avatar" class="img-circle">
-                        </a>
-                        <div class="media-body">
-                            <p class="push-bit">
-                                <span class="text-muted pull-right">
-                                    <small>30 min ago</small>
-                                </span>
-                                <small><a href="page_ready_user_profile.html">Howard Smith</a></small>
-                            </p>
-                            <p>I'm going to check it out and let you know!</p>
-                            <p>Thanks a lot!</p>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="tab-pane" id="terminated-services">
+                <div class="tab-pane active" id="tickets-list">
+                    <div class="block-content-full">
+                        <div class="table-responsive remove-margin-bottom">
+                            <table class="table table-striped table-vcenter remove-margin-bottom">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">SO</th>
+                                        <th>Description</th><th>Type</th>
+                                        <th>Time slot</th>
+                                        <th>Source</th>
+                                        <th>Destination</th>                                    
+                                        <th class="text-center">Monitoring</th>
+                                        <th>Options</th>
+                                        <th class="text-center"><i class="fa fa-comments"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {%for service in services%}
+                                    {%if service.destinationok%}
+                                    <form method="POST" action="{% url 'services:savechanges'%}">
+                                        {% csrf_token %}
+                                        
+                                    <tr>
+                                        <input type="text" id="so" name="so" value="{{service.SO.SO}}" hidden>
+                                        <td class="text-center">{{service.SO.SO}}</td>
+                                        <td>{{service.SO.name}}<br>
+                                            <a href="javascript:void(0)"><strong>Trace visual route of service</strong></a> 
+                                            {%if service.checkedby.all %} | <i class="fa fa-binoculars" title="{{service.checkedby.all|length}} operator(s) verified booking"></i>: {{service.checkedby.all|length}} {%endif%}
+                                            {%if service.openedby %} | <i class="fa fa-plug" title="Connection(s) opened"></i> {%endif%}
+                                            {%if service.originok.all %} | <i class="fa fa-toggle-right" title="{{service.originok.all|length}} confirmed origin signal"></i>: {{service.originok.all|length}} {%endif%}
+                                            {%if service.destinationok %} | <i class="fa fa-thumbs-o-up" title="service delivered"></i> {%endif%}
+                                            
+                                            
+                                        </td>
+                                        <td><span class="label label-success">ONGOING</span></td> <!--success, default or warning-->
+                                        <td>
+                                            <span class="label label-default">{{service.SO.starttime}}</span>
+                                        <br>
+                                        <span class="label label-default">{{service.SO.endtime}}</span>
+                                        </td>
+                                        <td>
+                                            <input type="text" id="origin" name="origin" class="form-control" autocomplete="off" placeholder="Custom origin..." {%if service.origin%}value="{{service.origin}}"{%endif%}>
+                                            <span class="text-muted"><strong>{{service.SO.origin}}</strong></span><br>
+                                            
+                                        </td>
+                                        <td>
+                                            <input type="text" id="destination" name="destination" class="form-control" autocomplete="off" placeholder="Custom destination..." {%if service.destination%}value="{{service.destination}}"{%endif%}>
+                                            <span class="text-muted"><strong>{{service.SO.destination}}</strong></span>
+                                        </td>
+                                        <td class="text-center">
+                                            
+                                            <input type="text" id="monitor" name="monitor" class="form-control" autocomplete="off" placeholder="ATE/NTT/OG..." {%if service.monitor%}value="{{service.monitor}}"{%endif%}>
+                                            <button class="btn btn-effect-ripple btn-primary fa fa-save" style="overflow: hidden;" action="submit"></button>
+                                            <a href="{% url 'services:refresh'%}" class="btn btn-effect-ripple btn-primary fa fa-refresh" style="overflow: hidden;"></a>
+                                            <a href="#" class="btn btn-effect-ripple btn-primary fa fa-search" style="overflow: hidden;"></a>
+                                            <a href="#" class="btn btn-effect-ripple btn-primary fa fa-remove" style="overflow: hidden;"></a>
+                                            </td>
+                                        
+                                        <td>
+                                            <div class="input-group-btn">
+                                                <button type="button" class="btn btn-effect-ripple btn-primary" style="overflow: hidden; position: relative;">Details</button>
+                                                <button type="button" class="btn btn-effect-ripple btn-primary dropdown-toggle" data-toggle="dropdown" style="overflow: hidden; position: relative;" aria-expanded="false"><span class="btn-ripple animate" style="height: 34px; width: 34px; top: 4.625px; left: -4.4375px;"></span><span class="caret"></span></button>
+                                                <ul class="dropdown-menu">
+                                                    <li {%for a in service.checkedby.all%}{%if a.username == user.username %}class="disabled"{%endif%}{%endfor%}><a href="{% url 'services:checkbooking' service.SO.SO %}">Check booking</a></li>
+                                                    <li {%if service.openedby %}class="disabled"{%endif%}><a href="{% url 'services:openconnections' service.SO.SO %}" {%if service.openedby %}disabled{%endif%}>Open connections</a></li>
+                                                    <li {%for a in service.originok.all%}{%if a.username == user.username %}class="disabled"{%endif%}{%endfor%}><a href="{% url 'services:originok' service.SO.SO %}">Origin signal OK</a></li>
+                                                    <li {%if service.destinationok %}class="disabled"{%endif%}><a href="{% url 'services:destinationok' service.SO.SO %}" {%if service.destinationok %}disabled{%endif%}>Destination OK</a></li>
+                                                    <li class="divider"></li>
+                                                    <li><a href="javascript:void(0)">Comentary</a></li>
+                                                    <li class="divider"></li>
+                                                    <li><a href="{% url 'services:issuereport' service.SO.SO%}">Issue report</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td class="text-center"><span class="badge">3</span></td>
+                                        
+                                    </tr>
+                                </form>
+                                {%endif%}
+                                    {%endfor%}
+                                    
+                                </tbody>
+                            </table>
                         </div>
-                    </li>
-                    <li class="media">
-                        <a href="page_ready_user_profile.html" class="pull-left">
-                            <img src="img/placeholders/avatars/avatar.jpg" alt="Avatar" class="img-circle">
-                        </a>
-                        <div class="media-body">
-                            <form action="page_ready_tickets.html#tickets-single" method="post">
-                                <textarea id="tickets-reply" name="tickets-reply" class="form-control" rows="5" placeholder="Enter your reply"></textarea>
-                                <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-reply"></i> Post Reply</button>
-                            </form>
+                        <div class="text-center">
+                            <ul class="pagination">
+                                <li class="disabled"><a href="javascript:void(0)"><i class="fa fa-chevron-left"></i></a></li>
+                                <li class="active"><a href="javascript:void(0)">1</a></li>
+                                <li><a href="javascript:void(0)">2</a></li>
+                                <li><a href="javascript:void(0)">3</a></li>
+                                <li><a href="javascript:void(0)"><i class="fa fa-chevron-right"></i></a></li>
+                            </ul>
                         </div>
-                    </li>
-                    <!-- END Replies -->
-                </ul>
+                    </div>
+                </div>
+                
             </div>
             <!-- END Ticket View -->
         </div>
         <!-- END Tabs Content -->
     </div>
     <!-- END Tickets Block -->
+</div>
 </div>
 {%endblock content%}

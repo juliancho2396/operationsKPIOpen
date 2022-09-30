@@ -53,6 +53,7 @@ class servicecoordination(models.Model):
     monitor = models.CharField(max_length=100, null=True, blank=True) #future implementation with relation to table of monitors
     origin = models.CharField(max_length=500, null=True, blank=True) #for manual coordination process
     destination = models.CharField(max_length=500, null=True, blank=True) #for manual coordination process
+    sentemail = models.BooleanField(default=False)
     def __str__(self) -> str:
         return str(self.SO.SO) + " " + str(self.SO.name)
 
